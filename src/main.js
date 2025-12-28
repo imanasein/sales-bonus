@@ -23,9 +23,9 @@ function calculateBonusByProfit(index, total, seller) {                         
 
     if (index === 0) {                                                                // на первом месте бонус 15%
         return 0.15 * profit;
-    } else if (index === 1) {                                                        // на втором или третьем месте по 10%
+    } else if (index === 1) {                                                         // на втором или третьем месте по 10%
         return 0.1 * profit;
-    } else if (index === 2) {                                                        // на втором или третьем месте по 10%
+    } else if (index === 2) {                                                         // на втором или третьем месте по 10%
         return 0.1 * profit;
     } else if (index === total-1) {                                                   // на последнем месте бонус - 0
         return 0;
@@ -47,6 +47,11 @@ function analyzeSalesData(data, options) {
         !Array.isArray(data.sellers) ||
         data.sellers.length === 0) {
             throw new Error('Некорректные входные данные');
+    }
+
+    if (!Array.isArray(data.purchase_records) || 
+        data.purchase_records.length === 0) {
+             throw new Error('Некорректные входные данные');
     }
 
     if (!options ||                                                                // @TODO: Проверка наличия опций (Шаг 2-2)
@@ -82,7 +87,7 @@ function analyzeSalesData(data, options) {
     data.purchase_records.forEach(record => {                                   // пройдём по всем чекам
         const seller = sellerIndex[record.seller_id];                           // Из чека берём id продавца
         seller.sales_count += 1;                                                // Увеличить количество продаж 
-        seller.revenue += record.total_amount;                                  // Увеличиваем выручку из каждого чека
+        seller.revenue += record.total_amount;                                  // Увеличиваем выручку из каждого чека (минус общую сумму скидки total_discont ???? Изменение к ТЗ )
 
         record.items.forEach(item => {                                          // Расчёт прибыли для каждого товара
             const product = productIndex[item.sku];                             // Товар по ключу sku
@@ -114,8 +119,8 @@ function analyzeSalesData(data, options) {
         }
     })
     
-    return sellerStats.map(seller => ({                                           // @TODO: Подготовка итоговой коллекции с нужными полями
-        id: seller.id,                                                           // Строка, идентификатор продавца
+    return sellerStats.map(seller => ({                                          // @TODO: Подготовка итоговой коллекции с нужными полями
+        seller_id: seller.id,                                                           // Строка, идентификатор продавца
         name: seller.name,                                                       // Строка, имя продавца
         revenue: +seller.revenue.toFixed(2),                                     // Число с двумя знаками после точки, выручка продавца
         profit: +seller.profit.toFixed(2),                                       // Число с двумя знаками после точки, прибыль продавца
